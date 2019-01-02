@@ -1,7 +1,13 @@
 import socket
+import struct
+from pyroute2 import IPDB
 import fpm_pb2 as fpm
 
-addr = ('127.0.0.1', 26200)
+ip = IPDB()
+print ip.by_name.keys()
+print ip.by_index.keys()
+
+addr = ('127.0.0.1', 2620)
 s = socket.socket()
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 s.bind(addr)
@@ -9,15 +15,13 @@ s.listen(10)
 while True:
     conn, addr = s.accept()
     print("new conn")
-    data = b''
+
     while True:
-        data += conn.recv(1000)
+        data = conn.recv(4)
+        d = bytearray(data)
+        x, y, size = struct.unpack(">ccH", d)
+        print(size)
+        body = conn.recv(size - 4)
         m = fpm.Message()
-        m.ParseFromString(data)
-        print(m.type)
-        if m.type == fpm.Message.ADD_ROUTE:
-            print("add route")
-        elif m.type == fpm.Message.REMOVE_ROUTE:
-            print("remove route")
-        else:
-            conn.close()
+        m.ParseFromString(body)
+        print(m)
