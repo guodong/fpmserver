@@ -28,11 +28,11 @@ def getMacByIp(ip):
 
 def add_flow(dst, output):
     if dst == '10.0.0.0/24':
-        dl_dst = getMacByIp('10.0.0.1')
-        actions = 'mod_dl_dst:' + dl_dst + ',output:' + output
+        # dl_dst = getMacByIp('10.0.0.1')
+        actions = 'mod_dl_dst:00:00:00:00:00:01' + ',output:' + output
     elif dst == '10.0.1.0/24':
-        dl_dst = getMacByIp('10.0.1.1')
-        actions = 'mod_dl_dst:' + dl_dst + ',output:' + output
+        # dl_dst = getMacByIp('10.0.1.1')
+        actions = 'mod_dl_dst:00:00:00:00:00:02' + ',output:' + output
     else:
         actions = 'output:' + output
 
