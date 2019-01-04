@@ -3,6 +3,7 @@ import array
 import struct
 import os
 import netifaces
+from arp_table import ARPTABLE
 import fpm_pb2 as fpm
 
 ifaces = netifaces.interfaces()
@@ -17,8 +18,25 @@ def ifIdtoPortId(ifId):
     return int(idx) + 1
 
 
+def getMacByIp(ip):
+    for entry in ARPTABLE:
+        if entry['IP address'] == ip:
+            return entry['HW address']
+
+    return None
+
+
 def add_flow(dst, output):
-    cmd = 'ovs-ofctl add-flow s table=100,ip,nw_dst=' + dst + ',actions=output:' + output
+    if dst == '10.0.0.0/24':
+        dl_dst = getMacByIp('10.0.0.1')
+        actions = 'mod_dl_dst:' + dl_dst + ',output:' + output
+    elif dst == '10.0.1.0/24':
+        dl_dst = getMacByIp('10.0.1.1')
+        actions = 'mod_dl_dst:' + dl_dst + ',output:' + output
+    else:
+        actions = 'output:' + output
+
+    cmd = 'ovs-ofctl add-flow s table=100,ip,nw_dst=' + dst + ',actions=' + actions
     print cmd
     os.system(cmd)
 
