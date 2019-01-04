@@ -3,7 +3,7 @@ import array
 import struct
 import os
 import netifaces
-from arp_table import ARPTABLE
+from python_arptable import ARPTABLE
 import fpm_pb2 as fpm
 
 ifaces = netifaces.interfaces()
